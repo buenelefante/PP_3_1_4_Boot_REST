@@ -10,7 +10,6 @@ import java.util.Set;
 
 @Entity
 public class User implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,15 +22,18 @@ public class User implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
-    public User() {
-    }
+    public User() {}
 
-    public User(String name, String lastName, int age, String email, String password, Set<Role> roles) {
+    public User(String name, String lastName, int age, String email, String password) {
         this.name = name;
         this.lastName = lastName;
         this.age = age;
         this.email = email;
         this.password = password;
+    }
+
+    public User(String name, String lastName, int age, String email, String password, Set<Role> roles) {
+        this(name, lastName, age, email, password);
         this.roles = roles;
     }
 
@@ -89,24 +91,37 @@ public class User implements UserDetails {
 
     public void setRoles(String roles) {
         this.roles = new HashSet<>();
-        if (roles.contains("ROLE_ADMIN")) {
-            this.roles.add(new Role("ROLE_ADMIN"));
+        if (roles.contains("ADMIN")) {
+            this.roles.add(new Role("ADMIN"));
         }
-        if (roles.contains("ROLE_USER")) {
-            this.roles.add(new Role("ROLE_USER"));
+        if (roles.contains("USER")) {
+            this.roles.add(new Role("USER"));
         }
     }
 
-
+    @Override
+    public String toString() {
+        String rolesString = "";
+        for (Role role: this.roles) {
+            rolesString += role.getRoleName();
+        }
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", age=" + age +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", roles=" + rolesString +
+                '}';
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
         return roles;
     }
 
     @Override
     public String getUsername() {
-
         return name;
     }
 

@@ -7,6 +7,8 @@ import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.repository.RoleRepository;
 import ru.kata.spring.boot_security.demo.repository.UserRepository;
+import ru.kata.spring.boot_security.demo.service.RoleService;
+import ru.kata.spring.boot_security.demo.service.UserService;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
@@ -14,29 +16,31 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
-@Transactional
 public class Initializer {
 
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
-    private BCryptPasswordEncoder passwordEncoder;
-    private Set<Role> rolesSet;
+    private UserService userService;
+    private RoleService roleService;
 
-    public Initializer(UserRepository userRepository, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
+    public Initializer(UserService userService, RoleService roleService) {
+        this.userService = userService;
+        this.roleService = roleService;
     }
+
     @PostConstruct
-    public void initRoles() {
-        Role[] rolesArray = new Role[]{new Role("ROLE_ADMIN"), new Role("ROLE_USER")};
-        rolesSet = new HashSet<>();
-        rolesSet.addAll(Arrays.asList(rolesArray));
-        roleRepository.saveAll(rolesSet);
-    }
-    @PostConstruct
-    public void initUsers() {
-        User admin = new User("admin", "admin", 50, "admin@admin.com", passwordEncoder.encode("admin"),rolesSet );
-        userRepository.save(admin);
+    public void Init() {
+        Set<Role> allRoles = new HashSet<>();
+        allRoles.add(new Role("ADMIN"));
+        allRoles.add(new Role("USER"));
+        roleService.createRoles(allRoles);
+        User admin = new User("admin", "admin", 29, "admin@admin.com", "admin");
+        admin.setRoles("ADMIN, USER");
+        userService.createUser(admin);
+        User user = new User("user", "user", 30, "user@mail.ru", "user");
+        user.setRoles("USER");
+        userService.createUser(user);
+        User user1 = new User("Vova", "Ivanov", 35, "vova@yandex.ru", "vova");
+        user1.setRoles("USER");
+        userService.createUser(user1);
+
     }
 }

@@ -8,11 +8,10 @@ import java.util.Set;
 @Entity
 public class Role implements GrantedAuthority {
     @Id
-    //@GeneratedValue
     private Long id;
     private String roleName;
 
-//    @Transient
+    @Transient
     @ManyToMany(mappedBy = "roles")
     private Set<User> users;
 
@@ -52,5 +51,4 @@ public class Role implements GrantedAuthority {
     public String toString() {
         return roleName;
     }
-
 }
